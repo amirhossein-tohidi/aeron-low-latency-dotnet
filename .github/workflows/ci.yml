@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Restore
+        run: dotnet restore Aeron.LowLatency.slnx
+
+      - name: Build
+        run: dotnet build Aeron.LowLatency.slnx -c Release --no-restore
+
+      - name: Test without load tests
+        env:
+          AERON_USE_LOCAL_DRIVER: 'true'
+        run: dotnet test Aeron.LowLatency.slnx -c Release --no-build --filter "Category!=LoadTests"

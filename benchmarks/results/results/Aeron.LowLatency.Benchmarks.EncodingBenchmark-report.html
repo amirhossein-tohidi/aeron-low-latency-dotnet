@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Aeron.LowLatency.Benchmarks.EncodingBenchmark-20260617-122351</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, Windows 11 (10.0.22631.5549/23H2/2023Update/SunValley3)
+Intel Core i7-6700HQ CPU 2.60GHz (Max: 2.59GHz) (Skylake), 1 CPU, 8 logical and 4 physical cores
+.NET SDK 10.0.103
+  [Host]     : .NET 10.0.3 (10.0.3, 10.0.326.7603), X64 RyuJIT x86-64-v3
+  Job-UFXZUX : .NET 10.0.3 (10.0.3, 10.0.326.7603), X64 RyuJIT x86-64-v3
+  ShortRun   : .NET 10.0.3 (10.0.3, 10.0.326.7603), X64 RyuJIT x86-64-v3
+</code></pre>
+<pre><code>Server=True  
+</code></pre>
+
+<table>
+<thead><tr><th>Method</th><th>Job </th><th>IterationCount</th><th>LaunchCount</th><th>WarmupCount</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>P95</th><th>Gen0</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>Encode</td><td>Job-UFXZUX</td><td>Default</td><td>Default</td><td>Default</td><td>48.07 ns</td><td>1.003 ns</td><td>2.661 ns</td><td>47.49 ns</td><td>52.01 ns</td><td>-</td><td>-</td>
+</tr><tr><td>Decode</td><td>Job-UFXZUX</td><td>Default</td><td>Default</td><td>Default</td><td>112.95 ns</td><td>2.314 ns</td><td>6.411 ns</td><td>112.10 ns</td><td>122.82 ns</td><td>0.0015</td><td>32 B</td>
+</tr><tr><td>Encode</td><td>ShortRun</td><td>3</td><td>1</td><td>3</td><td>54.60 ns</td><td>84.049 ns</td><td>4.607 ns</td><td>52.53 ns</td><td>59.15 ns</td><td>-</td><td>-</td>
+</tr><tr><td>Decode</td><td>ShortRun</td><td>3</td><td>1</td><td>3</td><td>125.67 ns</td><td>94.433 ns</td><td>5.176 ns</td><td>122.72 ns</td><td>130.76 ns</td><td>0.0014</td><td>32 B</td>
+</tr></tbody></table>
+</body>
+</html>

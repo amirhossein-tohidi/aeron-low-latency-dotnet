@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Aeron.LowLatency.Benchmarks/Aeron.LowLatency.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Aeron.LowLatency.Contracts/Aeron.LowLatency.Contracts.csproj" />
+    <Project Path="src/Aeron.LowLatency.Core/Aeron.LowLatency.Core.csproj" />
+    <Project Path="src/Aeron.LowLatency.Publisher/Aeron.LowLatency.Publisher.csproj" />
+    <Project Path="src/Aeron.LowLatency.Subscriber/Aeron.LowLatency.Subscriber.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Aeron.LowLatency.IntegrationTests/Aeron.LowLatency.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

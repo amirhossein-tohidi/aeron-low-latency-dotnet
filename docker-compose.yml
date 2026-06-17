@@ -1,0 +1,34 @@
+services:
+  aeron-media-driver:
+    image: eclipse-temurin:21-jre
+    command: >
+      /bin/sh -c "apt-get update >/dev/null
+      && apt-get install -y curl >/dev/null
+      && curl -fsSL -o /tmp/aeron-all.jar https://repo1.maven.org/maven2/io/aeron/aeron-all/1.51.0/aeron-all-1.51.0.jar
+      && java --add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED -Daeron.dir=/aeron/driver -Daeron.term.buffer.sparse.file=false -cp /tmp/aeron-all.jar io.aeron.driver.MediaDriver"
+    volumes:
+      - aeron-dir:/aeron
+
+  subscriber:
+    build:
+      context: .
+      dockerfile: src/Aeron.LowLatency.Subscriber/Dockerfile
+    depends_on:
+      - aeron-media-driver
+    command: ["--message-count", "10000", "--aeron-dir", "/aeron/driver"]
+    volumes:
+      - aeron-dir:/aeron
+
+  publisher:
+    build:
+      context: .
+      dockerfile: src/Aeron.LowLatency.Publisher/Dockerfile
+    depends_on:
+      - aeron-media-driver
+      - subscriber
+    command: ["--message-count", "10000", "--warmup-count", "1000", "--aeron-dir", "/aeron/driver"]
+    volumes:
+      - aeron-dir:/aeron
+
+volumes:
+  aeron-dir:
