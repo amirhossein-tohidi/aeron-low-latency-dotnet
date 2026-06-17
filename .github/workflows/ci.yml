@@ -30,3 +30,7 @@ jobs:
         env:
           AERON_USE_LOCAL_DRIVER: 'true'
         run: dotnet test Aeron.LowLatency.slnx -c Release --no-build --filter "Category!=LoadTests"
+
+      - name: Shutdown dotnet build servers
+        if: always()
+        run: dotnet build-server shutdown
