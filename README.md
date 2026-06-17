@@ -1,4 +1,9 @@
-# Aeron Low Latency Dotnet
+# Aeron Low Latency Dotnet 🚀
+
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)
+![Aeron](https://img.shields.io/badge/Messaging-Aeron-0B7285)
+![Tests](https://img.shields.io/badge/Tests-xUnit%20%2B%20Testcontainers-2F9E44)
+![Benchmarks](https://img.shields.io/badge/Benchmarks-BenchmarkDotNet-F08C00)
 
 > Note
 >
@@ -8,6 +13,32 @@
 A focused .NET 10 Aeron sample built with the Aeron .NET Client, compact binary message encoding, structured logging, OpenTelemetry metrics, Testcontainers-backed integration tests, Docker Compose, and BenchmarkDotNet.
 
 The project is intentionally about Aeron only. It does not implement Kafka, brokers, event sourcing, Clean Architecture, or a theoretical messaging abstraction. The goal is to keep the Aeron concepts visible in code.
+
+## Quick Start ⚡
+
+Restore, build, and run the regular test suite:
+
+```bash
+dotnet restore Aeron.LowLatency.slnx
+dotnet build Aeron.LowLatency.slnx -c Release
+dotnet test Aeron.LowLatency.slnx -c Release --no-build --filter "Category!=LoadTests"
+```
+
+Run the heavy load test:
+
+```bash
+dotnet test tests/Aeron.LowLatency.IntegrationTests/Aeron.LowLatency.IntegrationTests.csproj \
+  -c Release \
+  --filter "Category=LoadTests"
+```
+
+Run the encoding benchmark:
+
+```bash
+dotnet run -c Release --project benchmarks/Aeron.LowLatency.Benchmarks -- \
+  --filter "*EncodingBenchmark*" \
+  --artifacts benchmarks/results
+```
 
 ## Problem Statement Covered
 
@@ -34,7 +65,7 @@ The implementation in this repository chooses the following model:
 - Real Aeron integration tests where the runtime environment supports shared Aeron directories correctly.
 - Docker-based Media Driver setup documented clearly for local research.
 
-## Requirement Mapping
+## Requirement Mapping ✅
 
 | Requirement | Implementation |
 | --- | --- |
@@ -47,14 +78,14 @@ The implementation in this repository chooses the following model:
 | Retry/backoff | Publisher retries transient offer failures and times out cleanly when a publication never connects. |
 | Subscriber stats | `OrderSubscriber` records count, throughput, min, max, average, p50, p95, and p99 latency. |
 | Observability | Structured logging, `ActivitySource`, and OpenTelemetry metrics. |
-| Integration tests | `tests/Aeron.LowLatency.IntegrationTests` uses a real Java Aeron Media Driver. Linux uses Testcontainers; Windows uses a local driver because Aeron IPC needs host-local shared memory. |
+| Integration tests | `tests/Aeron.LowLatency.IntegrationTests` uses a real Java Aeron Media Driver. Linux uses Testcontainers by default; Windows and CI use a local driver because Aeron IPC needs host-local shared memory. |
 | Load tests | `HighVolumePubSubTests` is marked with `Category=LoadTests`. |
 | Benchmarks | Encoding, publishing throughput, and end-to-end latency benchmarks. |
-| CI | GitHub Actions restores, builds, and runs tests excluding load tests. |
+| CI | GitHub Actions restores, builds, runs tests excluding load tests, and shuts down .NET build servers. |
 
 ## Key Flows
 
-### Publish Orders
+### Publish Orders 📤
 
 1. CLI arguments are mapped into `AeronSettings`.
 2. `OrderPublisher` connects to the Media Driver.
@@ -64,7 +95,7 @@ The implementation in this repository chooses the following model:
 6. `Publication.Offer` is retried on transient pressure.
 7. Published message metrics are recorded.
 
-### Receive Orders
+### Receive Orders 📥
 
 1. `OrderSubscriber` connects to the same Media Driver.
 2. A subscription is created for channel and stream id.
@@ -73,9 +104,9 @@ The implementation in this repository chooses the following model:
 5. Ordering and latency are tracked.
 6. Throughput and latency stats are logged every second.
 
-### Load Testing
+### Load Testing 🔥
 
-1. Testcontainers starts a real Aeron Media Driver.
+1. A real Aeron Media Driver starts.
 2. Subscriber starts first.
 3. Publisher sends a large sequential stream.
 4. Tests assert full delivery and ordering.
@@ -92,7 +123,7 @@ The implementation in this repository chooses the following model:
 - Keep benchmark results local and hardware-specific.
 - Make Docker limitations explicit instead of hiding them.
 
-## Architecture
+## Architecture 🧭
 
 ```mermaid
 flowchart LR
@@ -128,8 +159,23 @@ flowchart LR
 - Fail clearly when a publication cannot connect.
 - Track throughput and latency percentiles.
 - Export OpenTelemetry metrics.
-- Run Docker-backed integration tests.
+- Run real Media Driver integration tests.
 - Run local performance benchmarks.
+
+## Message Format 🧬
+
+`OrderMessage` is encoded as a compact binary payload:
+
+| Field | Encoding |
+| --- | --- |
+| `OrderId` | `long`, little-endian |
+| `Price` | scaled `long`, 4 decimal places |
+| `Quantity` | `int`, little-endian |
+| `Side` | `byte` |
+| `CreatedAtUnixNano` | `long`, little-endian |
+| `Symbol` | ASCII bytes with 1-byte length prefix |
+
+JSON is intentionally not used. The publish path reuses buffers and wraps them in Aeron's `UnsafeBuffer`.
 
 ## Configuration
 
@@ -144,9 +190,18 @@ Default settings:
 | BatchSize | `256` |
 | ConnectionTimeout | `30 seconds` |
 
+Environment variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `AERON_USE_LOCAL_DRIVER=true` | Forces tests to start a local Java Media Driver instead of the Linux Testcontainers path. Used by CI. |
+| `AERON_JAVA=/path/to/java` | Optional Java executable for the local Media Driver. |
+| `AERON_DIR=/path/to/aeron-dir` | Optional Aeron directory for benchmarks or manual runs. |
+| `AERON_CHANNEL=aeron:ipc` | Optional channel override for benchmarks. |
+
 ## Run Locally
 
-Start the Aeron Media Driver:
+Start the Aeron Media Driver with Docker Compose:
 
 ```bash
 docker compose up aeron-media-driver
@@ -203,7 +258,7 @@ dotnet run -c Release --project src/Aeron.LowLatency.Subscriber -- \
   --stream-id 1001
 ```
 
-## Tests
+## Tests 🧪
 
 Run normal tests:
 
@@ -225,14 +280,38 @@ On Linux, tests start the driver through Testcontainers by default. CI sets `AER
 
 On Windows, tests start a local Java Media Driver because Aeron IPC coordinates through memory-mapped files and Docker Desktop Linux bind mounts do not provide reliable host-local driver heartbeats for the .NET client. If Java 17+ is not available, the fixture downloads a portable Temurin JRE 21 into the user-local cache.
 
-## Benchmarks
+Current integration coverage includes:
 
-Start a Media Driver first, then run:
+- Basic 10,000-message pub/sub.
+- 1,000,000-message load test.
+- Sequential message ordering.
+- Latency percentile collection.
+- Late-subscriber/backpressure resilience.
+- Two-subscriber IPC fan-out semantics.
+
+## Benchmarks 📊
+
+Start a Media Driver first for Aeron throughput and latency benchmarks, then run:
 
 ```bash
 dotnet run -c Release --project benchmarks/Aeron.LowLatency.Benchmarks -- \
   --artifacts benchmarks/results
 ```
+
+Run only encoding benchmarks:
+
+```bash
+dotnet run -c Release --project benchmarks/Aeron.LowLatency.Benchmarks -- \
+  --filter "*EncodingBenchmark*" \
+  --artifacts benchmarks/results
+```
+
+Latest local encoding benchmark sample:
+
+| Method | Mean | Median | P95 | Allocated |
+| --- | ---: | ---: | ---: | ---: |
+| Encode | `48.07 ns` | `47.49 ns` | `52.01 ns` | `0 B` |
+| Decode | `112.95 ns` | `112.10 ns` | `122.82 ns` | `32 B` |
 
 BenchmarkDotNet writes reports under `benchmarks/results`.
 
@@ -242,6 +321,19 @@ BenchmarkDotNet writes reports under `benchmarks/results`.
 Received=100000 throughput=251234 msg/sec latency(ns) min=12000 avg=83320 p50=61000 p95=181000 p99=320000 max=2500000
 Published 100000 messages to aeron:ipc/1001; backpressure=12, notConnected=0, adminAction=1
 ```
+
+## CI Notes 🤖
+
+GitHub Actions:
+
+1. Installs .NET 10.
+2. Installs Temurin Java 21.
+3. Restores the solution.
+4. Builds in Release mode.
+5. Runs tests excluding `LoadTests`.
+6. Shuts down .NET build servers to avoid noisy orphan-process cleanup.
+
+Load tests and benchmarks are intentionally not run in CI by default.
 
 ## Engineering Standards
 
@@ -275,7 +367,7 @@ Implemented:
 - Backpressure retry/backoff.
 - Structured logging.
 - ActivitySource and OpenTelemetry metrics.
-- Testcontainers-backed integration tests.
+- Real Media Driver integration tests.
 - Heavy load test category.
 - BenchmarkDotNet benchmark project.
 - Docker Compose Media Driver setup.
