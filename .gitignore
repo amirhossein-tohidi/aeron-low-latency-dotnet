@@ -1,0 +1,113 @@
+## .NET Core specific ##
+
+
+# Binaries and intermediates
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.sln.iml
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+
+# Tye
+.tye/
+
+# Visual Studio temporary files
+.vs/
+
+# VS Code directories
+.vscode/
+.vscode-csharp/
+.vscode-icons/
+
+# Rider / JetBrains
+.idea/
+
+# Build/Test outputs
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+CodeCoverage/
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+*.feature.cs
+
+# MSBuild logs
+*.binlog
+
+# NuGet packages
+*.nupkg
+*.snupkg
+
+# dotenv environment variables
+.env
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Temporary files
+~$*
+*~
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+## macOS specific ##
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
